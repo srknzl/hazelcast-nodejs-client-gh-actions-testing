@@ -1,4 +1,4 @@
-name: Test Server Backwards Compatibility
+name: Test Nodejs Client with server
 
 on:
   workflow_dispatch:
@@ -16,7 +16,7 @@ on:
         required: true
         default: os
 jobs:
-  test_nodejs_clients:
+  test_nodejs_client:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
