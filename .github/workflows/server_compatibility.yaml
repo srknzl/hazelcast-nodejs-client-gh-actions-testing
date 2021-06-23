@@ -16,14 +16,6 @@ on:
         required: true
         default: os
 jobs:
-  upload_jars:
-    name: Create and upload JARs
-    runs-on: ubuntu-latest
-    steps:
-      - name: Setup Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: 8
   test_nodejs_clients:
     runs-on: ubuntu-latest
     strategy:
