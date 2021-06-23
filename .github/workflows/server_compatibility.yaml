@@ -15,6 +15,10 @@ on:
         description: Server kind, os or enterprise
         required: true
         default: os
+      test_glob:
+        description: Mocha input for files to be tested
+        required: true
+        default: test/integration/backward_compatible
 jobs:
   test_nodejs_client:
     runs-on: ubuntu-latest
@@ -70,11 +74,11 @@ jobs:
         run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ github.event.inputs.server_kind }} --use-simple-server
       - name: Run non-enterprise tests
         if: ${{ github.event.inputs.server_kind == 'os' }}
-        run: node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
+        run: node node_modules/mocha/bin/mocha --recursive ${{ github.event.inputs.test_glob }}
         working-directory: master
       - name: Run all tests
         if: ${{ github.event.inputs.server_kind == 'enterprise' }}
-        run: node node_modules/mocha/bin/mocha --recursive test/integration/backward_compatible
+        run: node node_modules/mocha/bin/mocha --recursive ${{ github.event.inputs.test_glob }}
         working-directory: master
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
