@@ -16,7 +16,7 @@ on:
         required: true
         default: os
       test_glob:
-        description: Mocha input for files to be tested
+        description: Mocha test blob for files to be tested
         required: true
         default: test/integration/backward_compatible
 jobs:
