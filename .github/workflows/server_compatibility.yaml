@@ -18,13 +18,13 @@ on:
       test_glob:
         description: Mocha test blob for files to be tested
         required: true
-        default: test/integration/backward_compatible
+        default: test/integration/backward_compatible/**/*.js
 jobs:
   test_nodejs_client:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-    name: Test Node.js client ${{ github.event.inputs.client_tag }} with ${{ github.event.inputs.server_version }} server
+    name: Test Node.js client ${{ github.event.inputs.client_tag }} with ${{ github.event.inputs.server_version }} ${{ github.event.inputs.server_kind }} server
     steps:
       - uses: actions/checkout@v2
       - name: Setup Python
