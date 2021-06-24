@@ -16,11 +16,12 @@
 'use strict';
 
 const chai = require('chai');
+const sinon = require('sinon');
 chai.should();
 
 const RC = require('../../RC');
 const { Client } = require('../../../../');
-const { promiseWaitMilliseconds, assertTrueEventually, randomString } = require('../../../TestUtil');
+const { promiseWaitMilliseconds, assertTrueEventually, randomString, markClientVersionAtLeast } = require('../../../TestUtil');
 
 describe('ReliableTopicOnClusterRestartTest', function () {
 
@@ -28,10 +29,17 @@ describe('ReliableTopicOnClusterRestartTest', function () {
     let member;
     let client1;
     let client2;
+    let sandbox;
+
+    // Before https://github.com/hazelcast/hazelcast-nodejs-client/pull/704 these tests won't work
+    before(function () {
+        markClientVersionAtLeast(this, '4.0.2');
+    });
 
     beforeEach(async function () {
         client1 = undefined;
         client2 = undefined;
+        sandbox = sinon.createSandbox();
         cluster = await RC.createCluster(null, null);
         member = await RC.startMember(cluster.id);
     });
@@ -43,6 +51,7 @@ describe('ReliableTopicOnClusterRestartTest', function () {
         if (client2) {
             await client2.shutdown();
         }
+        sandbox.restore();
         await RC.shutdownCluster(cluster.id);
     });
 
@@ -55,8 +64,7 @@ describe('ReliableTopicOnClusterRestartTest', function () {
                 }
             },
             properties: {
-                'hazelcast.client.invocation.timeout.millis': invocationTimeoutMillis,
-                'hazelcast.logging.level': 'TRACE'
+                'hazelcast.client.invocation.timeout.millis': invocationTimeoutMillis
             }
         });
     };
@@ -68,9 +76,6 @@ describe('ReliableTopicOnClusterRestartTest', function () {
                 connectionRetry: {
                     clusterConnectTimeoutMillis: Number.MAX_SAFE_INTEGER
                 }
-            },
-            properties: {
-                'hazelcast.logging.level': 'TRACE'
             }
         });
     };
@@ -96,8 +101,12 @@ describe('ReliableTopicOnClusterRestartTest', function () {
             messageArrived = true;
         });
 
-        // wait some time for adding message listener
-        await promiseWaitMilliseconds(2000);
+        // wait for the message listener to be initialized
+        const runner = Object.values(topic1.runners)[0];
+        const nextFake = sandbox.replace(runner, 'next', sandbox.fake(runner.next));
+        await assertTrueEventually(async () => {
+            nextFake.called.should.be.true;
+        });
 
         await RC.shutdownMember(cluster.id, member.uuid);
         await RC.startMember(cluster.id);
@@ -127,8 +136,12 @@ describe('ReliableTopicOnClusterRestartTest', function () {
             messageArrived = true;
         });
 
-        // wait some time for adding message listener
-        await promiseWaitMilliseconds(2000);
+        // wait for the message listener to be initialized
+        const runner = Object.values(topic1.runners)[0];
+        const nextFake = sandbox.replace(runner, 'next', sandbox.fake(runner.next));
+        await assertTrueEventually(async () => {
+            nextFake.called.should.be.true;
+        });
 
         await RC.shutdownMember(cluster.id, member.uuid);
 
@@ -158,8 +171,12 @@ describe('ReliableTopicOnClusterRestartTest', function () {
             messageArrived = true;
         });
 
-        // wait some time for adding message listener
-        await promiseWaitMilliseconds(2000);
+        // wait for the message listener to be initialized
+        const runner = Object.values(topic1.runners)[0];
+        const nextFake = sandbox.replace(runner, 'next', sandbox.fake(runner.next));
+        await assertTrueEventually(async () => {
+            nextFake.called.should.be.true;
+        });
 
         await RC.shutdownMember(cluster.id, member.uuid);
         await RC.startMember(cluster.id);
