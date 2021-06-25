@@ -39,7 +39,8 @@ describe('ClientReconnectTest', function () {
             clusterName: cluster.id,
             properties: {
                 'hazelcast.client.heartbeat.interval': 1000,
-                'hazelcast.client.heartbeat.timeout': 3000
+                'hazelcast.client.heartbeat.timeout': 3000,
+                'hazelcast.logging.level': 'TRACE'
             }
         });
         const map = await client.getMap('test');
@@ -66,7 +67,8 @@ describe('ClientReconnectTest', function () {
                 },
                 properties: {
                     'hazelcast.client.heartbeat.interval': 1000,
-                    'hazelcast.client.heartbeat.timeout': 3000
+                    'hazelcast.client.heartbeat.timeout': 3000,
+                    'hazelcast.logging.level': 'TRACE'
                 }
             });
         }).then((cl) => {
@@ -102,7 +104,8 @@ describe('ClientReconnectTest', function () {
                 clusterName: cluster.id,
                 properties: {
                     'hazelcast.client.heartbeat.interval': 1000,
-                    'hazelcast.client.heartbeat.timeout': 3000
+                    'hazelcast.client.heartbeat.timeout': 3000,
+                    'hazelcast.logging.level': 'TRACE'
                 }
             });
         }).then((cl) => {
