@@ -7,6 +7,14 @@ on:
         description: Client of the tag to test, starts with v
         required: true
         default: v4.0.0
+      build_jar:
+        description: Whether to build jars (yes/no)
+        required: true
+        default: no
+      server_branch:
+        description: Server branch to build from (provide if build_jar is yes)
+        required: false
+        default: master
       server_version:
         description: Server version
         required: true
@@ -20,6 +28,58 @@ on:
         required: true
         default: test/integration/backward_compatible/**/*.js
 jobs:
+  upload_jars:
+    name: Create and upload JARs
+    runs-on: ubuntu-latest
+    if:  ${{ github.event.inputs.build_jar == 'yes' }}
+    steps:
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - name: Checkout to Hazelcast
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/hazelcast
+          path: hazelcast
+          ref: ${{ github.event.inputs.server_branch }}
+      - name: Checkout to Hazelcast Enterprise
+        uses: actions/checkout@v2
+        with:
+          repository: hazelcast/hazelcast-enterprise
+          path: hazelcast-enterprise
+          ref: ${{ github.event.inputs.server_branch }}
+          token: ${{ secrets.GH_PAT }}
+      - name: Build JARs
+        run: mvn clean install -DskipTests=True
+        working-directory: hazelcast
+      - name: Build Enterprise JARs
+        run: mvn clean install -DskipTests=True
+        working-directory: hazelcast-enterprise
+      - name: Upload Hazelcast JAR
+        uses: actions/upload-artifact@v2
+        with:
+          name: hazelcast
+          path: hazelcast/hazelcast-all/target/hazelcast-all-*[!s].jar
+          retention-days: 1
+      - name: Upload Hazelcast tests JAR
+        uses: actions/upload-artifact@v2
+        with:
+          name: hazelcast-tests
+          path: hazelcast/hazelcast/target/hazelcast-*-tests.jar
+          retention-days: 1
+      - name: Upload Hazelcast Enterprise JAR
+        uses: actions/upload-artifact@v2
+        with:
+          name: hazelcast-enterprise
+          path: hazelcast-enterprise/hazelcast-enterprise-all/target/hazelcast-enterprise-all-*[!s].jar
+          retention-days: 1
+      - name: Upload Hazelcast Enterprise tests JAR
+        uses: actions/upload-artifact@v2
+        with:
+          name: hazelcast-enterprise-tests
+          path: hazelcast-enterprise/hazelcast-enterprise/target/hazelcast-enterprise-*-tests.jar
+          retention-days: 1
   test_nodejs_client:
     runs-on: ubuntu-latest
     strategy:
@@ -39,8 +99,33 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 8
-      - name: Download JARs
+      - name: Download released JARs
+        if:  ${{ github.event.inputs.build_jar == 'no' }}
         run: python download_server_jars.py --version ${{ github.event.inputs.server_version }} --server-kind ${{ github.event.inputs.server_kind }} --dst jars
+      - name: Download Hazelcast tests JAR
+        if:  ${{ github.event.inputs.build_jar == 'yes' }}
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast-tests
+          path: jars
+      - name: Download Hazelcast JAR
+        if: ${{ github.event.inputs.server_kind == 'os' && github.event.inputs.build_jar == 'yes' }} 
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast
+          path: jars
+      - name: Download Hazelcast Enterprise JAR
+        if: ${{ github.event.inputs.server_kind == 'enterprise' && github.event.inputs.build_jar == 'yes' }} 
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast-enterprise
+          path: jars
+      - name: Download Hazelcast Enterprise tests JAR
+        if: ${{ github.event.inputs.server_kind == 'enterprise' && github.event.inputs.build_jar == 'yes' }} 
+        uses: actions/download-artifact@v2
+        with:
+          name: hazelcast-enterprise-tests
+          path: jars
       - name: Checkout to master
         uses: actions/checkout@v2
         with:
