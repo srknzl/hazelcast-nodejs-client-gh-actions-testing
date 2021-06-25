@@ -16,8 +16,8 @@ on:
         required: false
         default: master
       server_version:
-        description: Server version
-        required: true
+        description: Server version to download (provide if build_jar is no)
+        required: false
         default: 4.1.4
       server_kind:
         description: Server kind, os or enterprise
