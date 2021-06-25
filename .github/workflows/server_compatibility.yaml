@@ -26,7 +26,7 @@ on:
       test_glob:
         description: Mocha test blob for files to be tested
         required: true
-        default: test/integration/backward_compatible/**/*.js
+        default: test/integration/backward_compatible
 jobs:
   upload_jars:
     name: Create and upload JARs
