@@ -109,19 +109,19 @@ jobs:
         with:
           name: hazelcast-tests
           path: jars
-      - name: Download Hazelcast JAR
+      - name: Download built Hazelcast JAR
         if: ${{ github.event.inputs.server_kind == 'os' && github.event.inputs.build_jar == 'yes' }} 
         uses: actions/download-artifact@v2
         with:
           name: hazelcast
           path: jars
-      - name: Download Hazelcast Enterprise JAR
+      - name: Download built Hazelcast Enterprise JAR
         if: ${{ github.event.inputs.server_kind == 'enterprise' && github.event.inputs.build_jar == 'yes' }} 
         uses: actions/download-artifact@v2
         with:
           name: hazelcast-enterprise
           path: jars
-      - name: Download Hazelcast Enterprise tests JAR
+      - name: Download built Hazelcast Enterprise tests JAR
         if: ${{ github.event.inputs.server_kind == 'enterprise' && github.event.inputs.build_jar == 'yes' }} 
         uses: actions/download-artifact@v2
         with:
