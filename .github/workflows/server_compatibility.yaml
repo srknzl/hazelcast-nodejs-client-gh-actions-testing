@@ -80,7 +80,8 @@ jobs:
           name: hazelcast-enterprise-tests
           path: hazelcast-enterprise/hazelcast-enterprise/target/hazelcast-enterprise-*-tests.jar
           retention-days: 1
-  test_nodejs_client:
+  test:
+    needs: [upload_jars]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
