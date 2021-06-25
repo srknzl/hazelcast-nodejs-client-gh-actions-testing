@@ -31,19 +31,21 @@ jobs:
   upload_jars:
     name: Create and upload JARs
     runs-on: ubuntu-latest
-    if:  ${{ github.event.inputs.build_jar == 'yes' }}
     steps:
       - name: Setup Java
+        if:  ${{ github.event.inputs.build_jar == 'yes' }}
         uses: actions/setup-java@v1
         with:
           java-version: 8
       - name: Checkout to Hazelcast
+        if:  ${{ github.event.inputs.build_jar == 'yes' }}
         uses: actions/checkout@v2
         with:
           repository: hazelcast/hazelcast
           path: hazelcast
           ref: ${{ github.event.inputs.server_branch }}
       - name: Checkout to Hazelcast Enterprise
+        if:  ${{ github.event.inputs.build_jar == 'yes' }}
         uses: actions/checkout@v2
         with:
           repository: hazelcast/hazelcast-enterprise
@@ -51,30 +53,36 @@ jobs:
           ref: ${{ github.event.inputs.server_branch }}
           token: ${{ secrets.GH_PAT }}
       - name: Build JARs
+        if:  ${{ github.event.inputs.build_jar == 'yes' }}
         run: mvn clean install -DskipTests=True
         working-directory: hazelcast
       - name: Build Enterprise JARs
+        if:  ${{ github.event.inputs.build_jar == 'yes' }}
         run: mvn clean install -DskipTests=True
         working-directory: hazelcast-enterprise
       - name: Upload Hazelcast JAR
+        if:  ${{ github.event.inputs.build_jar == 'yes' }}
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast
           path: hazelcast/hazelcast-all/target/hazelcast-all-*[!s].jar
           retention-days: 1
       - name: Upload Hazelcast tests JAR
+        if:  ${{ github.event.inputs.build_jar == 'yes' }}
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast-tests
           path: hazelcast/hazelcast/target/hazelcast-*-tests.jar
           retention-days: 1
       - name: Upload Hazelcast Enterprise JAR
+        if:  ${{ github.event.inputs.build_jar == 'yes' }}
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast-enterprise
           path: hazelcast-enterprise/hazelcast-enterprise-all/target/hazelcast-enterprise-all-*[!s].jar
           retention-days: 1
       - name: Upload Hazelcast Enterprise tests JAR
+        if:  ${{ github.event.inputs.build_jar == 'yes' }}
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast-enterprise-tests
