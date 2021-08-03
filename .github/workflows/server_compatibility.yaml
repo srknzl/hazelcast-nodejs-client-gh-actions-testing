@@ -156,7 +156,7 @@ jobs:
       - name: Change InvocationService
         run: |
           rm -rf $GITHUB_WORKSPACE/master/src/invocation/InvocationService.ts
-          cp -a $GITHUB_WORKSPACE/tests/InvocationService $GITHUB_WORKSPACE/master/src/invocation
+          cp -a $GITHUB_WORKSPACE/tests/InvocationService.ts $GITHUB_WORKSPACE/master/src/invocation
       - name: Install dependencies and compile client
         run: |
           npm install
