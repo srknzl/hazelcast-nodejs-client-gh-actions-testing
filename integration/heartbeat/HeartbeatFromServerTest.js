@@ -65,7 +65,6 @@ describe('HeartbeatFromServerTest', function () {
 
     it('connectionRemoved fired when second member stops heartbeating', function (done) {
         let member2;
-        const memberAddedPromise = deferredPromise();
         RC.startMember(cluster.id).then(() => {
             return Client.newHazelcastClient({
                 clusterName: cluster.id,
@@ -77,21 +76,12 @@ describe('HeartbeatFromServerTest', function () {
             });
         }).then((c) => {
             client = c;
-            client.clusterService.addMembershipListener({
-                memberAdded: (membershipEvent) => {
-                    const address =
-                        new AddressImpl(membershipEvent.member.address.host, membershipEvent.member.address.port);
-                    warmUpConnectionToAddressWithRetry(client, address, 3)
-                        .then(() => memberAddedPromise.resolve())
-                        .catch((err) => memberAddedPromise.reject(err));
-                }
-            });
             return RC.startMember(cluster.id);
         }).then((m2) => {
             member2 = m2;
-            return memberAddedPromise.promise;
         }).then(() => {
             client.getConnectionManager().once('connectionRemoved', (connection) => {
+                console.log('Connection removed');
                 const remoteAddress = connection.getRemoteAddress();
                 if (remoteAddress.host === member2.host && remoteAddress.port === member2.port) {
                     if (wasClosedAfterHeartbeatTimeout(connection)) {
