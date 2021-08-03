@@ -170,8 +170,8 @@ jobs:
           cp -a $GITHUB_WORKSPACE/tag/package.json $GITHUB_WORKSPACE/master/package.json
       - name: Copy tests from tests branch
         run: |
-          rm -rf $GITHUB_WORKSPACE/master/test/integration/backward_compatible
-          cp -a $GITHUB_WORKSPACE/tests/backward_compatible $GITHUB_WORKSPACE/master/test/integration
+          rm -rf $GITHUB_WORKSPACE/master/test/integration
+          cp -a $GITHUB_WORKSPACE/tests/integration $GITHUB_WORKSPACE/master/test
       - name: Start RC
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
