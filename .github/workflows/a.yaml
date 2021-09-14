@@ -1,0 +1,21 @@
+name: Test
+
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    name: Create and upload JARs
+    runs-on:
+    strategy:
+      matrix:
+        python-version: [ 3.4 ]
+        os: [ windows-latest ]
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: |
+           pip install psutil
+            
