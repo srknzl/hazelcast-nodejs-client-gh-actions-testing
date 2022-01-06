@@ -65,7 +65,14 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast
-          path: hazelcast/hazelcast-all/target/hazelcast-all-*[!s].jar
+          path: hazelcast/hazelcast/target/hazelcast-*[!s].jar
+          retention-days: 1
+      - name: Upload Hazelcast SQL JAR (if exists)
+        uses: actions/upload-artifact@v2
+        with:
+          name: hazelcast-sql
+          path: hazelcast/hazelcast-sql/target/hazelcast-sql-*[!s].jar
+          if-no-files-found: ignore
           retention-days: 1
       - name: Upload Hazelcast tests JAR
         if:  ${{ github.event.inputs.build_jar == 'yes' }}
@@ -79,7 +86,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: hazelcast-enterprise
-          path: hazelcast-enterprise/hazelcast-enterprise-all/target/hazelcast-enterprise-all-*[!s].jar
+          path: hazelcast-enterprise/hazelcast-enterprise/target/hazelcast-enterprise-*[!s].jar
           retention-days: 1
       - name: Upload Hazelcast Enterprise tests JAR
         if:  ${{ github.event.inputs.build_jar == 'yes' }}
