@@ -147,10 +147,6 @@ jobs:
           repository: srknzl/test
           path: tests
           ref: tests
-      - name: Change InvocationService
-        run: |
-          rm -rf $GITHUB_WORKSPACE/tag/src/invocation/InvocationService.ts
-          cp -a $GITHUB_WORKSPACE/tests/InvocationService.ts $GITHUB_WORKSPACE/tag/src/invocation
       - name: Install dependencies and compile client
         run: |
           npm install
