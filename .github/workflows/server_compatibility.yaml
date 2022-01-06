@@ -157,26 +157,41 @@ jobs:
           npm install
         working-directory: master
       - name: Copy client code into master
+        if: ${{ matrix.server_kind == 'ubuntu-latest' }} 
         run: |
           rm -rf $GITHUB_WORKSPACE/master/lib
           rm $GITHUB_WORKSPACE/master/package.json
           cp -a $GITHUB_WORKSPACE/tag/lib $GITHUB_WORKSPACE/master/lib
           cp -a $GITHUB_WORKSPACE/tag/package.json $GITHUB_WORKSPACE/master/package.json
       - name: Copy tests from tests branch
+        if: ${{ matrix.server_kind == 'ubuntu-latest' }} 
         run: |
           rm -rf $GITHUB_WORKSPACE/master/test/integration
           cp -a $GITHUB_WORKSPACE/tests/integration $GITHUB_WORKSPACE/master/test
+      - name: Copy client code into master (windows)
+        if: ${{ matrix.server_kind == 'windows-latest' }} 
+        run: |
+          npm install -g rimraf
+          rimraf $GITHUB_WORKSPACE\master\lib
+          rimraf $GITHUB_WORKSPACE\master\package.json
+          Xcopy $GITHUB_WORKSPACE\tag\lib $GITHUB_WORKSPACE\master\lib /E /H /C /I  
+          copy $GITHUB_WORKSPACE\tag\package.json $GITHUB_WORKSPACE\master\package.json
+      - name: Copy tests from tests branch (windows)
+        if: ${{ matrix.server_kind == 'windows-latest' }} 
+        run: |
+          rimraf $GITHUB_WORKSPACE\master\test\integration
+          Xcopy $GITHUB_WORKSPACE\tests\integration $GITHUB_WORKSPACE\master\test /E /H /C /I
       - name: Start RC
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
         run: python start_rc.py --rc-version '0.8-SNAPSHOT' --jars jars --server-kind ${{ github.event.inputs.server_kind }} --use-simple-server
       - name: Run non-enterprise tests
         if: ${{ github.event.inputs.server_kind == 'os' }}
-        run: node node_modules/mocha/bin/mocha --recursive ${{ github.event.inputs.test_glob }}
+        run: npx mocha --recursive ${{ github.event.inputs.test_glob }}
         working-directory: master
       - name: Run all tests
         if: ${{ github.event.inputs.server_kind == 'enterprise' }}
-        run: node node_modules/mocha/bin/mocha --recursive ${{ github.event.inputs.test_glob }}
+        run: npx mocha --recursive ${{ github.event.inputs.test_glob }}
         working-directory: master
         env:
           HAZELCAST_ENTERPRISE_KEY: ${{ secrets.HAZELCAST_ENTERPRISE_KEY }}
