@@ -90,10 +90,12 @@ jobs:
           retention-days: 1
   test:
     needs: [upload_jars]
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-    name: Test Node.js client ${{ github.event.inputs.client_tag }} with ${{ github.event.inputs.server_version }} ${{ github.event.inputs.server_kind }} server
+      matrix:
+          os: [ ubuntu-latest, windows-latest ]
+    name: Test Node.js client ${{ github.event.inputs.client_tag }} with ${{ github.event.inputs.server_version }} ${{ github.event.inputs.server_kind }} server on ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - name: Setup Python
